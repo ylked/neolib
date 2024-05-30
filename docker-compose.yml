@@ -1,0 +1,41 @@
+services:
+  activemq-service:
+    image: apache/activemq-artemis:latest-alpine
+    container_name: neolib-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    environment:
+      - ARTEMIS_USER=mq
+      - ARTEMIS_PASSWORD=mq
+
+
+  book-db-service:
+    image: mysql:8.2.0-oracle
+    container_name: neolib-book-db
+    ports:
+      - "3380:3306"
+    volumes:
+      - "mysql_book:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    restart: unless-stopped
+
+  loan-db-service:
+    image: mysql:8.2.0-oracle
+    container_name: neolib-loan-db
+    ports:
+      - "3381:3306"
+    volumes:
+      - "mysql_loan:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    restart: unless-stopped
+
+
+volumes:
+  mysql_book:
+  mysql_loan:
+
+
