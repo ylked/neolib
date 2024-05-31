@@ -19,8 +19,8 @@ public class LoanEntity {
     @JoinColumn(name = "book_id", nullable = false)
     private BookEntity book;
 
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private LocalDateTime deadline;
 
     public Long getId() {
@@ -39,20 +39,20 @@ public class LoanEntity {
         this.user = user;
     }
 
-    public LocalDateTime getStart() {
-        return start;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
-    public void setStart(LocalDateTime start) {
-        this.start = start;
+    public void setStartDate(LocalDateTime start) {
+        this.startDate = start;
     }
 
-    public LocalDateTime getEnd() {
-        return end;
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
-    public void setEnd(LocalDateTime end) {
-        this.end = end;
+    public void setEndDate(LocalDateTime end) {
+        this.endDate = end;
     }
 
     public LocalDateTime getDeadline() {

@@ -34,8 +34,15 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public void borrowBook(Long bookId, Long userId) throws UnavailableBook, TooManyBorrowedBooks, UserNotFound, BookNotFound {
-        BookEntity book = bookRepository.findById(bookId).orElseThrow(BookNotFound::new);
         UserEntity user = userRepository.findById(userId).orElseThrow(UserNotFound::new);
+        Optional<BookEntity> optionalBook = bookRepository.findById(bookId);
+        BookEntity book = null;
+
+        if (optionalBook.isEmpty()) {
+            //TODO fetch book from book service with REST, then save it in local db
+        } else {
+            book = optionalBook.get();
+        }
 
         //TODO check that book can be borrowed on book service, with REST
 
@@ -43,7 +50,7 @@ public class LoanServiceImpl implements LoanService {
             throw new TooManyBorrowedBooks();
         }
 
-        if (loanRepository.existsByBookIdAndEndIsNull(bookId)) {
+        if (loanRepository.existsByBookIdAndEndDateIsNull(bookId)) {
             throw new UnavailableBook();
         }
 
@@ -51,7 +58,7 @@ public class LoanServiceImpl implements LoanService {
 
         LoanEntity entity = new LoanEntity();
         entity.setBook(book);
-        entity.setStart(LocalDateTime.now());
+        entity.setStartDate(LocalDateTime.now());
         entity.setDeadline(deadline);
         entity.setUser(user);
 
@@ -62,8 +69,8 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public void returnBook(Long bookId) throws AlreadyReturned {
-        LoanEntity entity = loanRepository.findByBookIdAndEndIsNull(bookId).orElseThrow(AlreadyReturned::new);
-        entity.setEnd(LocalDateTime.now());
+        LoanEntity entity = loanRepository.findByBookIdAndEndDateIsNull(bookId).orElseThrow(AlreadyReturned::new);
+        entity.setEndDate(LocalDateTime.now());
         loanRepository.save(entity);
 
         //TODO post JMS message
@@ -72,7 +79,7 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public User whoHas(Long bookId) {
         return loanRepository
-                .findByBookIdAndEndIsNull(bookId)
+                .findByBookIdAndEndDateIsNull(bookId)
                 .map((LoanEntity loan) -> {
                     UserEntity user = loan.getUser();
                     return new User(
@@ -89,7 +96,7 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public List<Book> borrowedBooks(Long userId) {
         return loanRepository
-                .findByUserIdAndEndIsNull(userId)
+                .findByUserIdAndEndDateIsNull(userId)
                 .stream()
                 .map((LoanEntity loan) -> {
                     BookEntity book = loan.getBook();
