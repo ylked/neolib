@@ -150,7 +150,7 @@ Sur la figure \ref{fig:architecture}, on peut voir l'architecture générale du 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{img/neolib.png}
+    \includegraphics[width=0.5\textwidth]{img/neolib.png}
     \caption{Architecture générale du système}
     \label{fig:architecture}
 \end{figure}
@@ -245,17 +245,57 @@ Il est nécessaire d'avoir installé les logiciels suivants:
 Tout d'abord, lancer le Docker Compose pour démarrer RabbitMQ et les bases de données mySQL : 
 
 \begin{lstlisting}[language=bash]
-docker-compose up
+docker-compose up -d
 \end{lstlisting}
 
-Ensuite, lancer le registre Eureka :
+Ensuite, lancer les services un par un (si possible dans des terminaux séparés). Pour 
+le service \textit{book-service}, on lance 3 instances et pour le service \textit{loan-service},
+on lance 2 instances. Ceci permet de tester le \textit{load balancing}.
 
 \begin{lstlisting}[language=bash]
   cd registry-service
   mvn spring-boot:run
-  cd ..
 \end{lstlisting}
 
+\begin{lstlisting}[language=bash]
+  cd api-gateway
+  mvn spring-boot:run
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash]
+  cd book-service
+  mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=9901
+  mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=9902
+  mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=9903
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash]
+  cd loan-service
+  mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=9801
+  mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=9802
+\end{lstlisting}
+
+Alternativement, on peut lancer les services avec IntelliJ IDEA, qui permet 
+de lancer les services en parallèle de manière plus simple. 
+
+Pour tester les différents services, il est possible d'utiliser Postman. Un fichier 
+\textit{postman.json} est fourni à la racine du projet, qui contient la configuration 
+nécessaire pour tester les services. 
+
 \section{Conclusion}
+
+Ce projet a permis de mettre en pratique les concepts du pattern \textit{microservices} que nous avons
+étudié en cours. 
+L'application en tant que telle n'a en réalité pas beaucoup de sens et n'a pas de nécessité d'utiliser 
+ce pattern. Il a fallu inventer des cas d'utilisation pour remplir les contraintes du projet, ce qui 
+donne une implémentation qui manque parfois de sens. 
+
+Dans l'ensemble, les concepts ont bien été mis en pratique et les services communiquent correctement 
+entre eux. Le load balancing fonctionne correctement et les services sont bien enregistrés auprès du
+registre Eureka. 
+
+D'autres améliorations pourraient être apportées, comme par exemple la gestion de l'authentification, 
+la possibilité de gérer les utilisateurs, de gérer les retards et les amendes, de prolonger un emprunt, 
+ou encore d'effectuer une réservation de livre. 
  
 \end{document}
