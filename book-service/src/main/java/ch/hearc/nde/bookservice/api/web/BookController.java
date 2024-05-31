@@ -84,7 +84,7 @@ public class BookController {
         }
     }
 
-    @PatchMapping("/{id}/lost")
+    @PutMapping("/{id}/lost")
     public @ResponseBody ResponseEntity<BookResponseDTO> lost(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(getDTOFromModel(service.changeStatus(id, BookStatus.LOST)));

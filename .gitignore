@@ -6,3 +6,7 @@
 loan-service/.mvn/
 
 book-service/.mvn/
+
+mysql_book/
+
+mysql_loan/

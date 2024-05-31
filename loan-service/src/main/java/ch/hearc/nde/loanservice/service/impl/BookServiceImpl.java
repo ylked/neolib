@@ -3,7 +3,7 @@ package ch.hearc.nde.loanservice.service.impl;
 import ch.hearc.nde.loanservice.repository.BookRepository;
 import ch.hearc.nde.loanservice.repository.entity.BookEntity;
 import ch.hearc.nde.loanservice.service.BookService;
-import ch.hearc.nde.loanservice.service.exception.BookNotFound;
+import ch.hearc.nde.loanservice.exception.BookNotFound;
 import ch.hearc.nde.loanservice.service.model.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

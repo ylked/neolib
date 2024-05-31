@@ -1,4 +1,4 @@
-package ch.hearc.nde.loanservice.service.exception;
+package ch.hearc.nde.loanservice.exception;
 
 public class UnavailableBook extends Exception {
 }

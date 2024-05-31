@@ -1,6 +1,6 @@
 package ch.hearc.nde.loanservice.service;
 
-import ch.hearc.nde.loanservice.service.exception.BookNotFound;
+import ch.hearc.nde.loanservice.exception.BookNotFound;
 import ch.hearc.nde.loanservice.service.model.Book;
 
 public interface BookService {

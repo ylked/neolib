@@ -1,20 +1,21 @@
 package ch.hearc.nde.loanservice.api.web;
 
 import ch.hearc.nde.loanservice.api.web.dto.request.NewLoanRequestDTO;
-import ch.hearc.nde.loanservice.api.web.dto.request.ReturnBookRequestDTO;
+import ch.hearc.nde.loanservice.api.web.dto.request.BookIdRequestDTO;
 import ch.hearc.nde.loanservice.api.web.dto.response.BookResponseDTO;
 import ch.hearc.nde.loanservice.api.web.dto.response.StringMessage;
 import ch.hearc.nde.loanservice.api.web.dto.response.UserResponseDTO;
+import ch.hearc.nde.loanservice.exception.*;
 import ch.hearc.nde.loanservice.service.LoanService;
-import ch.hearc.nde.loanservice.service.exception.*;
 import ch.hearc.nde.loanservice.service.model.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/loan")
+@RequestMapping("/loans")
 public class LoanController {
     @Autowired
     private LoanService service;
@@ -32,16 +33,20 @@ public class LoanController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringMessage("User not found"));
         } catch (BookNotFound e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringMessage("Book not found"));
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringMessage("Internal server error"));
         }
     }
 
     @PostMapping("/return")
-    public @ResponseBody ResponseEntity<?> returnBook(@RequestBody ReturnBookRequestDTO dto) {
+    public @ResponseBody ResponseEntity<?> returnBook(@RequestBody BookIdRequestDTO dto) {
         try {
             service.returnBook(dto.bookId());
             return ResponseEntity.ok().build();
         } catch (AlreadyReturned e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringMessage("Book has already been returned or does not exist"));
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringMessage("Internal server error"));
         }
     }
 
@@ -74,5 +79,18 @@ public class LoanController {
                         ))
                         .toList()
         );
+    }
+
+    @PutMapping("/lost/{bookId}")
+    public @ResponseBody ResponseEntity<?> markAsLost(@PathVariable Long bookId) {
+        try {
+            service.markAsLost(bookId);
+            return ResponseEntity.ok().build();
+        } catch (BookNotFound e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringMessage("Book not found"));
+        } catch (AlreadyReturned e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new StringMessage("Book has already been" +
+                    " returned or does not exist"));
+        }
     }
 }

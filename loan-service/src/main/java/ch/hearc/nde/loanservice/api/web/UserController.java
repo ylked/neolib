@@ -3,10 +3,10 @@ package ch.hearc.nde.loanservice.api.web;
 import ch.hearc.nde.loanservice.api.web.dto.request.UserRequestDTO;
 import ch.hearc.nde.loanservice.api.web.dto.response.UserResponseDTO;
 import ch.hearc.nde.loanservice.service.UserService;
-import ch.hearc.nde.loanservice.service.exception.CardNumberConflict;
-import ch.hearc.nde.loanservice.service.exception.EmailConflict;
-import ch.hearc.nde.loanservice.service.exception.HasOngoingLoans;
-import ch.hearc.nde.loanservice.service.exception.UserNotFound;
+import ch.hearc.nde.loanservice.exception.CardNumberConflict;
+import ch.hearc.nde.loanservice.exception.EmailConflict;
+import ch.hearc.nde.loanservice.exception.HasOngoingLoans;
+import ch.hearc.nde.loanservice.exception.UserNotFound;
 import ch.hearc.nde.loanservice.service.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserService service;
@@ -77,6 +77,22 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         } catch (HasOngoingLoans e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User has ongoing loans, cannot delete account yet");
+        }
+    }
+
+    @GetMapping("/{id}")
+    public @ResponseBody ResponseEntity<?> getUser(@PathVariable Long id) {
+        try {
+            User user = service.get(id);
+            return ResponseEntity.ok(new UserResponseDTO(
+                    user.id(),
+                    user.firstName(),
+                    user.lastName(),
+                    user.email(),
+                    user.cardNumber()
+            ));
+        } catch (UserNotFound e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 }

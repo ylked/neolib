@@ -1,5 +1,6 @@
 package ch.hearc.nde.loanservice.remote.impl;
 
+import ch.hearc.nde.loanservice.exception.BookNotFound;
 import ch.hearc.nde.loanservice.remote.BookServiceRemoteClient;
 import ch.hearc.nde.loanservice.remote.model.BookBody;
 import ch.hearc.nde.loanservice.remote.model.BookResponse;
@@ -16,18 +17,24 @@ public class BookServiceRemoteClientImpl implements BookServiceRemoteClient {
     private BookRestClient client;
 
     @Override
-    public Optional<BookResponse> getBook(Long bookId) {
-        Optional<BookBody> response = client.getBook(bookId).getBody();
-        if (Objects.isNull(response)) {
-            return Optional.empty();
+    public BookResponse getBook(Long bookId) throws BookNotFound {
+        try {
+            Optional<BookBody> response = client.getBook(bookId).getBody();
+            if (Objects.isNull(response) || response.isEmpty()) {
+                throw new BookNotFound();
+            }
+
+            return response.map(bookBody -> new BookResponse(
+                    bookBody.id(),
+                    bookBody.title(),
+                    bookBody.author(),
+                    bookBody.isbn(),
+                    bookBody.status()
+            )).get();
+        } catch (Exception e) {
+            throw new BookNotFound();
         }
-        return response.map(bookBody -> new BookResponse(
-                bookBody.id(),
-                bookBody.title(),
-                bookBody.author(),
-                bookBody.isbn(),
-                bookBody.status()
-        ));
+
     }
 
     @Override

@@ -4,10 +4,10 @@ import ch.hearc.nde.loanservice.repository.UserRepository;
 import ch.hearc.nde.loanservice.repository.entity.UserEntity;
 import ch.hearc.nde.loanservice.service.LoanService;
 import ch.hearc.nde.loanservice.service.UserService;
-import ch.hearc.nde.loanservice.service.exception.CardNumberConflict;
-import ch.hearc.nde.loanservice.service.exception.EmailConflict;
-import ch.hearc.nde.loanservice.service.exception.HasOngoingLoans;
-import ch.hearc.nde.loanservice.service.exception.UserNotFound;
+import ch.hearc.nde.loanservice.exception.CardNumberConflict;
+import ch.hearc.nde.loanservice.exception.EmailConflict;
+import ch.hearc.nde.loanservice.exception.HasOngoingLoans;
+import ch.hearc.nde.loanservice.exception.UserNotFound;
 import ch.hearc.nde.loanservice.service.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,6 +96,11 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.delete(entity);
+    }
+
+    @Override
+    public User get(Long id) throws UserNotFound {
+        return getUserFromEntity(userRepository.findById(id).orElseThrow(UserNotFound::new));
     }
 
     private User getUserFromEntity(UserEntity entity) {

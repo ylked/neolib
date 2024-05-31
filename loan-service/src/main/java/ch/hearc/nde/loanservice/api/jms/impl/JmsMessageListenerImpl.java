@@ -6,7 +6,7 @@ import ch.hearc.nde.loanservice.api.jms.deserialization.BookUpdatedJmsDeserializ
 import ch.hearc.nde.loanservice.api.jms.deserialization.JsonDeserialisationException;
 import ch.hearc.nde.loanservice.api.jms.model.BookUpdatedMessage;
 import ch.hearc.nde.loanservice.service.BookService;
-import ch.hearc.nde.loanservice.service.exception.BookNotFound;
+import ch.hearc.nde.loanservice.exception.BookNotFound;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.jms.JMSException;
 import jakarta.jms.TextMessage;
