@@ -1,5 +1,7 @@
 package ch.hearc.nde.bookservice.service.impl;
 
+import ch.hearc.nde.bookservice.jms.JmsMessageProducer;
+import ch.hearc.nde.bookservice.jms.model.BookUpdatedMessage;
 import ch.hearc.nde.bookservice.repository.BookRepository;
 import ch.hearc.nde.bookservice.repository.entity.BookEntity;
 import ch.hearc.nde.bookservice.common.BookStatus;
@@ -7,6 +9,7 @@ import ch.hearc.nde.bookservice.service.BookService;
 import ch.hearc.nde.bookservice.service.exception.IllegalOperation;
 import ch.hearc.nde.bookservice.service.exception.NotFound;
 import ch.hearc.nde.bookservice.service.model.Book;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,10 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     private BookRepository repository;
+
+    @Autowired
+    private JmsMessageProducer jmsMessageProducer;
+
     @Override
     public Book create(String title, String author, String isbn) {
         BookEntity entity = new BookEntity(null, title, author, isbn, BookStatus.AVAILABLE);
@@ -41,18 +48,32 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book rename(Long id, String title) throws NotFound {
+    public Book rename(Long id, String title) throws NotFound, JsonProcessingException {
         BookEntity entity = repository.findById(id).orElseThrow(NotFound::new);
         entity.setTitle(title);
         entity = repository.save(entity);
+
+        jmsMessageProducer.sendBookUpdated(new BookUpdatedMessage(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getAuthor()
+        ));
+
         return getBookFromEntity(entity);
     }
 
     @Override
-    public Book changeAuthor(Long id, String author) throws NotFound {
+    public Book changeAuthor(Long id, String author) throws NotFound, JsonProcessingException {
         BookEntity entity = repository.findById(id).orElseThrow(NotFound::new);
         entity.setAuthor(author);
         entity = repository.save(entity);
+
+        jmsMessageProducer.sendBookUpdated(new BookUpdatedMessage(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getAuthor()
+        ));
+
         return getBookFromEntity(entity);
     }
 

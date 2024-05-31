@@ -9,6 +9,7 @@ import ch.hearc.nde.bookservice.service.exception.IllegalOperation;
 import ch.hearc.nde.bookservice.service.exception.NotFound;
 import ch.hearc.nde.bookservice.service.model.Book;
 import ch.hearc.nde.bookservice.common.BookStatus;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +64,8 @@ public class BookController {
             }
         } catch (NotFound e) {
             return ResponseEntity.notFound().build();
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
