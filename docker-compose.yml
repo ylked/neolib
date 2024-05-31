@@ -33,6 +33,12 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     restart: unless-stopped
 
+  adminer-service:
+    image: adminer
+    container_name: neolib-adminer
+    restart: no
+    ports:
+      - "9000:8080"
 
 volumes:
   mysql_book:
