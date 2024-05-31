@@ -205,7 +205,56 @@ les requêtes HTTP.
 
 \subsection{Flux de communication asynchrones}
 
+Les flux de communication asynchrones sont effectués en utilisant le protocole AMQP. Ils sont
+utilisés pour la communications entres les services, dans les deux sens. Ils permettent 
+de notifier sans attendre de réponse. 
+
+Ils sont utilisés dans les cas suivants : 
+
+\begin{itemize}
+  \item Lors de l'emprunt d'un livre, le service \textit{loan-service} doit notifier le service
+    \textit{book-service} que le livre a été emprunté, pour la mise à jour du statut du livre ; 
+    
+  \item Lors du retour d'un livre, le service \textit{loan-service} doit notifier le service
+    \textit{book-service} que le livre a été rendu, pour la mise à jour du statut du livre ; 
+
+  \item Lorsque les méta-données d'un livre sont modifiées, le service \textit{book-service} doit
+    notifier le service \textit{loan-service} pour la mise à jour des informations dans la base de données
+    du service \textit{loan-service}.
+\end{itemize}
+
+
+
 \section{Guide de démarrage}
+
+Dans cette section, on décrit la procédure qui permet de démarrer correctement les services. 
+
+\subsection{Prérequis}
+
+Il est nécessaire d'avoir installé les logiciels suivants:
+
+\begin{itemize}
+  \item Java 17
+  \item Maven 3.9
+  \item Docker 25
+  \item Docker Compose 2.24
+\end{itemize}
+
+\subsection{Démarrage des services}
+
+Tout d'abord, lancer le Docker Compose pour démarrer RabbitMQ et les bases de données mySQL : 
+
+\begin{lstlisting}[language=bash]
+docker-compose up
+\end{lstlisting}
+
+Ensuite, lancer le registre Eureka :
+
+\begin{lstlisting}[language=bash]
+  cd registry-service
+  mvn spring-boot:run
+  cd ..
+\end{lstlisting}
 
 \section{Conclusion}
  
